@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
@@ -60,19 +61,24 @@ export default function Dashboard() {
         </CardHeader>
       </Card>
 
-      <Tabs className="col-span-1 sm:col-span-2 md:col-span-3">
+      <Tabs
+        defaultValue="overview"
+        className="col-span-1 sm:col-span-2 md:col-span-3"
+      >
         <TabsList className="w-full">
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="transactions">Transactions</TabsTrigger>
+          <TabsTrigger value="overview">Overview</TabsTrigger>
+          <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>
         <TabsContent value="overview"></TabsContent>
         <TabsContent value="transactions">
-            <Card>
-                <CardHeader>
-                    <CardTitle>Transactions</CardTitle>
-                    <CardAction></CardAction>
-                </CardHeader>
-            </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Transactions</CardTitle>
+              <CardAction>
+                <Button>Add Transaction</Button>
+              </CardAction>
+            </CardHeader>
+          </Card>
         </TabsContent>
       </Tabs>
     </div>
