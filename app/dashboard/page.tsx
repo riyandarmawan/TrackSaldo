@@ -1,3 +1,5 @@
+"use client";
+
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -7,13 +9,25 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingDown, TrendingUp } from "lucide-react";
+import { useState } from "react";
 
 export default function Dashboard() {
+  const [openAddTransactionDialog, setOpenAddTransactionDialog] =
+    useState<boolean>(false);
+
   return (
     <div className="container py-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      {/* Total Balance */}
+      {/* Total Balance Card */}
       <Card className="@container/card sm:col-span-2 md:col-span-1">
         <CardHeader>
           <CardDescription>Total Balance</CardDescription>
@@ -29,7 +43,7 @@ export default function Dashboard() {
         </CardHeader>
       </Card>
 
-      {/* Income */}
+      {/* Income Card */}
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Income</CardDescription>
@@ -45,7 +59,7 @@ export default function Dashboard() {
         </CardHeader>
       </Card>
 
-      {/* Expenses */}
+      {/* Expenses Card */}
       <Card className="@container/card">
         <CardHeader>
           <CardDescription>Expenses</CardDescription>
@@ -74,13 +88,47 @@ export default function Dashboard() {
           <Card>
             <CardHeader>
               <CardTitle>Transactions</CardTitle>
-              <CardAction>
+              <CardAction onClick={() => setOpenAddTransactionDialog(true)}>
                 <Button>Add Transaction</Button>
               </CardAction>
             </CardHeader>
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* add transaction dialog */}
+      <Dialog
+        open={openAddTransactionDialog}
+        onOpenChange={(open) => {
+          if (!open) {
+            setOpenAddTransactionDialog(false);
+          }
+        }}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Add Transaction</DialogTitle>
+          </DialogHeader>
+
+          {/* <div className="grid gap-4">
+            <div className="grid gap-3">
+              <Label htmlFor="name-1">Name</Label>
+              <Input id="name-1" name="name" defaultValue="Pedro Duarte" />
+            </div>
+            <div className="grid gap-3">
+              <Label htmlFor="username-1">Username</Label>
+              <Input id="username-1" name="username" defaultValue="@peduarte" />
+            </div>
+          </div> */}
+
+          <DialogFooter>
+            <DialogClose asChild>
+              <Button variant="outline">Cancel</Button>
+            </DialogClose>
+            <Button>Submit</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
