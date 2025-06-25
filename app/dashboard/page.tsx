@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { TrendingDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
@@ -115,15 +116,23 @@ export default function Dashboard() {
           <div className="grid gap-4">
             <div className="grid gap-3">
               <Label htmlFor="title">Title</Label>
-              <Input type="text" id="title" name="title" placeholder="Please enter the titles of your income or expenses." />
+              <Input type="text" id="title" placeholder="Type the title transaction" />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="amount">Amount</Label>
-              <Input type="text" id="amount" name="amount" placeholder="Please enter the amount of your income or expenses." />
+              <Input type="number" min={0} id="amount" placeholder="Type the amount of transaction" />
             </div>
             <div className="grid gap-3">
               <Label htmlFor="type">Type</Label>
-              {/* <Select id="type" name="type" placeholder="Please enter the amount of your income or expenses."></ */}
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select a type of transaction"/>
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="income">Income</SelectItem>
+                  <SelectItem value="expenses">Expenses</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
