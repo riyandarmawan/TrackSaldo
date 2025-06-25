@@ -1,4 +1,4 @@
-fzp{
+{
   "name": "out",
   "version": "0.1.0",
   "private": true,
@@ -9,6 +9,7 @@ fzp{
     "lint": "next lint"
   },
   "dependencies": {
+    "@hookform/resolvers": "^5.1.1",
     "@radix-ui/react-dialog": "^1.1.14",
     "@radix-ui/react-label": "^2.1.7",
     "@radix-ui/react-select": "^2.2.5",
@@ -26,7 +27,7 @@ fzp{
     "zod": "link:@hookform/resolvers/zod"
   },
   "devDependencies": {
-    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/eslintrc": "link:@hookform/resolvers/zod",
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
