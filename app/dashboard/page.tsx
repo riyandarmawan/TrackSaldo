@@ -18,15 +18,59 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingDown, TrendingUp } from "lucide-react";
+import { CalendarIcon, TrendingDown, TrendingUp } from "lucide-react";
 import { useState } from "react";
+import { z } from "zod";
+import { zodResolver } from "@hookform/resolvers/zod";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { useForm } from "react-hook-form";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { format } from "date-fns";
+import { Calendar } from "@/components/ui/calendar";
+
+const addFormSchema = z.object({
+  title: z.string().min(2),
+  amount: z.number().min(1000),
+  type: z.enum(["income", "expense"]),
+  date: z.date(),
+});
 
 export default function Dashboard() {
   const [openAddTransactionDialog, setOpenAddTransactionDialog] =
     useState<boolean>(false);
+
+  const addForm = useForm<z.infer<typeof addFormSchema>>({
+    resolver: zodResolver(addFormSchema),
+    defaultValues: {
+      title: "",
+      amount: 1000,
+      type: "income",
+      date: new Date(),
+    },
+  });
+
+  function onAddSubmit(values: z.infer<typeof addFormSchema>) {
+    console.log(values);
+  }
 
   return (
     <div className="container py-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
@@ -49,7 +93,7 @@ export default function Dashboard() {
       {/* Income Card */}
       <Card className="@container/card">
         <CardHeader>
-          <CardDescription>Income</CardDescription>
+          <CardDescription>Incomes</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
             Rp100.000
           </CardTitle>
@@ -109,39 +153,122 @@ export default function Dashboard() {
         }}
       >
         <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Add Transaction</DialogTitle>
-          </DialogHeader>
+          <Form {...addForm}>
+            <form
+              onSubmit={addForm.handleSubmit(onAddSubmit)}
+              className="space-y-8"
+            >
+              <DialogHeader>
+                <DialogTitle>Add Transaction</DialogTitle>
+              </DialogHeader>
 
-          <div className="grid gap-4">
-            <div className="grid gap-3">
-              <Label htmlFor="title">Title</Label>
-              <Input type="text" id="title" placeholder="Type the title transaction" />
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="amount">Amount</Label>
-              <Input type="number" min={0} id="amount" placeholder="Type the amount of transaction" />
-            </div>
-            <div className="grid gap-3">
-              <Label htmlFor="type">Type</Label>
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Select a type of transaction"/>
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="income">Income</SelectItem>
-                  <SelectItem value="expenses">Expenses</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-          </div>
+              <div className="grid gap-4">
+                <FormField
+                  control={addForm.control}
+                  name="title"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Title</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="Enter the title of your transaction"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="outline">Cancel</Button>
-            </DialogClose>
-            <Button>Submit</Button>
-          </DialogFooter>
+                <FormField
+                  control={addForm.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          placeholder="Type the amount of transaction"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={addForm.control}
+                  name="type"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Type</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger className="w-full">
+                            <SelectValue placeholder="Select a type of transaction" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="income">Income</SelectItem>
+                          <SelectItem value="expense">Expense</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={addForm.control}
+                  name="date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Date</FormLabel>
+                      <Popover>
+                        <FormControl>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              data-empty={!field.value}
+                              className="data-[empty=true]:text-muted-foreground w-full justify-start text-left font-normal"
+                            >
+                              <CalendarIcon />
+                              {field.value ? (
+                                format(field.value, "PPP")
+                              ) : (
+                                <span>Pick a date</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                        </FormControl>
+                        <PopoverContent className="w-auto p-0">
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </div>
+
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="outline">Cancel</Button>
+                </DialogClose>
+                <Button type="submit">Submit</Button>
+              </DialogFooter>
+            </form>
+          </Form>
         </DialogContent>
       </Dialog>
     </div>
