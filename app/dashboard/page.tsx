@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardAction,
+  CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
@@ -46,6 +47,9 @@ import {
 } from "@/components/ui/popover";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
+import { Transaction } from "@/lib/types";
+import { columns } from "./columns";
+import { DataTable } from "./data-table";
 
 const addFormSchema = z.object({
   title: z.string().min(2),
@@ -53,6 +57,23 @@ const addFormSchema = z.object({
   type: z.enum(["income", "expense"]),
   date: z.date(),
 });
+
+const transactions: Transaction[] = [
+  {
+    uuid: "1",
+    title: "Salary",
+    amount: 100000,
+    type: "income",
+    date: new Date(),
+  },
+  {
+    uuid: "2",
+    title: "Rent",
+    amount: 50000,
+    type: "expense",
+    date: new Date(),
+  },
+];
 
 export default function Dashboard() {
   const [openAddTransactionDialog, setOpenAddTransactionDialog] =
@@ -139,6 +160,10 @@ export default function Dashboard() {
                 <Button>Add Transaction</Button>
               </CardAction>
             </CardHeader>
+
+            <CardContent>
+              <DataTable columns={columns} data={transactions} />
+            </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
