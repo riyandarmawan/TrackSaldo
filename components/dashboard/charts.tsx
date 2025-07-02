@@ -1,5 +1,12 @@
 import { Transaction } from "@/lib/types";
-import { ChartConfig, ChartContainer } from "../ui/chart";
+import {
+  ChartConfig,
+  ChartContainer,
+  ChartLegend,
+  ChartLegendContent,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "../ui/chart";
 import {
   CartesianGrid,
   Legend,
@@ -56,12 +63,14 @@ export function TransactionChart({ transactionData }: TransactionChartProps) {
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={summarizedData}>
           <CartesianGrid strokeDasharray="3 3" />
-          <XAxis dataKey="date" />
+          <XAxis
+            dataKey="date"
+          />
           <YAxis />
-          <Tooltip />
-          <Legend />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <ChartLegend content={<ChartLegendContent payload={summarizedData}/>} />
           <Line
-          type="monotone"
+            type="monotone"
             dataKey="income"
             stroke={chartConfig.income.color}
             name={chartConfig.income.label}
