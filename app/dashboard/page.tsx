@@ -51,6 +51,7 @@ import { Transaction } from "@/lib/types";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
 import { NumericFormat } from "react-number-format";
+import { TransactionChart } from "@/components/dashboard/charts";
 
 const addFormSchema = z.object({
   title: z.string().min(2),
@@ -94,7 +95,7 @@ export default function Dashboard() {
       return acc - curr.amount;
     }
   }, 0);
-  
+
   const incomes = transactions.reduce((acc, curr) => {
     if (curr.type === "income") {
       return acc + curr.amount;
@@ -102,7 +103,7 @@ export default function Dashboard() {
       return acc;
     }
   }, 0);
-  
+
   const expenses = transactions.reduce((acc, curr) => {
     if (curr.type === "expense") {
       return acc + curr.amount;
@@ -110,13 +111,13 @@ export default function Dashboard() {
       return acc;
     }
   }, 0);
-  
+
   const formattedTotalBalance = new Intl.NumberFormat("id-ID", {
     style: "currency",
     currency: "IDR",
     minimumFractionDigits: 0,
     maximumFractionDigits: 0,
-  }).format(totalBalance);;
+  }).format(totalBalance);
 
   const formattedIncomes = new Intl.NumberFormat("id-ID", {
     style: "currency",
@@ -126,11 +127,11 @@ export default function Dashboard() {
   }).format(incomes);
 
   const formattedExpenses = new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-        minimumFractionDigits: 0,
-        maximumFractionDigits: 0,
-      }).format(expenses);;
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(expenses);
 
   const addForm = useForm<z.infer<typeof addFormSchema>>({
     resolver: zodResolver(addFormSchema),
@@ -154,7 +155,7 @@ export default function Dashboard() {
     setTransactions([...transactions, newTransaction]);
 
     setOpenAddTransactionDialog(false);
-    
+
     addForm.reset({
       title: "",
       amount: 1000,
@@ -221,7 +222,17 @@ export default function Dashboard() {
           <TabsTrigger value="overview">Overview</TabsTrigger>
           <TabsTrigger value="transactions">Transactions</TabsTrigger>
         </TabsList>
-        <TabsContent value="overview"></TabsContent>
+        <TabsContent value="overview">
+          <Card>
+            <CardHeader>
+              <CardTitle>Overview</CardTitle>
+            </CardHeader>
+
+            <CardContent>
+              <TransactionChart transactionData={transactions} />
+            </CardContent>
+          </Card>
+        </TabsContent>
         <TabsContent value="transactions">
           <Card>
             <CardHeader>
