@@ -50,6 +50,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Transaction } from "@/lib/types";
 import { columns } from "./columns";
 import { DataTable } from "./data-table";
+import { NumericFormat } from "react-number-format";
 
 const addFormSchema = z.object({
   title: z.string().min(2),
@@ -58,26 +59,78 @@ const addFormSchema = z.object({
   date: z.date(),
 });
 
-const transactions: Transaction[] = [
-  {
-    uuid: "1",
-    title: "Salary",
-    amount: 100000,
-    type: "income",
-    date: new Date(),
-  },
-  {
-    uuid: "2",
-    title: "Rent",
-    amount: 50000,
-    type: "expense",
-    date: new Date(),
-  },
-];
-
 export default function Dashboard() {
   const [openAddTransactionDialog, setOpenAddTransactionDialog] =
     useState<boolean>(false);
+
+  const [transactions, setTransactions] = useState<Transaction[]>([
+    {
+      uuid: "1",
+      title: "Salary",
+      amount: 100000,
+      type: "income",
+      date: new Date(),
+    },
+    {
+      uuid: "2",
+      title: "Rent",
+      amount: 50000,
+      type: "expense",
+      date: new Date(),
+    },
+  ]);
+
+  const formatter = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  });
+
+  const totalBalance = transactions.reduce((acc, curr) => {
+    if (curr.type === "income") {
+      return acc + curr.amount;
+    } else {
+      return acc - curr.amount;
+    }
+  }, 0);
+  
+  const incomes = transactions.reduce((acc, curr) => {
+    if (curr.type === "income") {
+      return acc + curr.amount;
+    } else {
+      return acc;
+    }
+  }, 0);
+  
+  const expenses = transactions.reduce((acc, curr) => {
+    if (curr.type === "expense") {
+      return acc + curr.amount;
+    } else {
+      return acc;
+    }
+  }, 0);
+  
+  const formattedTotalBalance = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(totalBalance);;
+
+  const formattedIncomes = new Intl.NumberFormat("id-ID", {
+    style: "currency",
+    currency: "IDR",
+    minimumFractionDigits: 0,
+    maximumFractionDigits: 0,
+  }).format(incomes);
+
+  const formattedExpenses = new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
+      }).format(expenses);;
 
   const addForm = useForm<z.infer<typeof addFormSchema>>({
     resolver: zodResolver(addFormSchema),
@@ -90,7 +143,24 @@ export default function Dashboard() {
   });
 
   function onAddSubmit(values: z.infer<typeof addFormSchema>) {
-    console.log(values);
+    const newTransaction = {
+      uuid: crypto.randomUUID(),
+      title: values.title,
+      amount: values.amount,
+      type: values.type,
+      date: values.date,
+    };
+
+    setTransactions([...transactions, newTransaction]);
+
+    setOpenAddTransactionDialog(false);
+    
+    addForm.reset({
+      title: "",
+      amount: 1000,
+      type: "income",
+      date: new Date(),
+    });
   }
 
   return (
@@ -100,7 +170,7 @@ export default function Dashboard() {
         <CardHeader>
           <CardDescription>Total Balance</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            Rp80.000
+            {formattedTotalBalance}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -116,7 +186,7 @@ export default function Dashboard() {
         <CardHeader>
           <CardDescription>Incomes</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            Rp100.000
+            {formattedIncomes}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -132,7 +202,7 @@ export default function Dashboard() {
         <CardHeader>
           <CardDescription>Expenses</CardDescription>
           <CardTitle className="text-2xl font-semibold tabular-nums @[250px]/card:text-3xl">
-            Rp20.000
+            {formattedExpenses}
           </CardTitle>
           <CardAction>
             <Badge variant="outline">
@@ -212,11 +282,17 @@ export default function Dashboard() {
                     <FormItem>
                       <FormLabel>Amount</FormLabel>
                       <FormControl>
-                        <Input
-                          type="number"
+                        <NumericFormat
+                          customInput={Input}
                           min={0}
+                          defaultValue={field.value}
                           placeholder="Type the amount of transaction"
-                          {...field}
+                          thousandSeparator="."
+                          decimalSeparator=","
+                          prefix="Rp "
+                          onValueChange={(values) =>
+                            field.onChange(values.floatValue)
+                          }
                         />
                       </FormControl>
                       <FormMessage />
